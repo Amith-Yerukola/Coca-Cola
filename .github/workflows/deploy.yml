@@ -30,7 +30,7 @@ jobs:
           # Replace <WEBHOOK_URL> with your actual webhook URL
           curl -X POST "<WEBHOOK_URL>" -H "Content-Type: application/json" -d "{\"files\": \"$files\"}"
         else
-          echo "No files were changed or created in this PR."
+          echo "No files were changed or created in this PR"
         fi
 
     - name: Complete
