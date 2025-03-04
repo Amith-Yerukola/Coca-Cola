@@ -22,7 +22,7 @@ jobs:
         files=$(git diff --name-only --diff-filter=R HEAD^..HEAD)  # --diff-filter=R filters for renamed/moved files
         echo "::set-output name=files::$files"
 
-    - name: Send file names to Webhook
+    - name: Send file names to Fusion Webhook
       if: steps.get_files.outputs.files != ''
       run: |
         FILES="${{ steps.get_files.outputs.files }}"
