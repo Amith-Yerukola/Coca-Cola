@@ -26,7 +26,7 @@ jobs:
 
         # Check if there are any changed/created files
         if [ -n "$files" ]; then
-          echo "Files changed or created : $files"
+          echo "Files changed or created: $files"
           # Replace <WEBHOOK_URL> with your actual webhook URL
           curl -X POST "<WEBHOOK_URL>" -H "Content-Type: application/json" -d "{\"files\": \"$files\"}"
         else
