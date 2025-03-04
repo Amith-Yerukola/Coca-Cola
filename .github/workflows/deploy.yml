@@ -5,7 +5,7 @@ on:
     branches:
       - Development  # Trigger when a PR is merged into the development branch
     types:
-      - closed  # Trigger only when the PR is closed (merged)
+      - closed  # Trigger only when the PR is closed ( merged )
 
 jobs:
   send_files_to_webhook:
