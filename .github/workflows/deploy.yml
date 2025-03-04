@@ -3,7 +3,7 @@ name: Send File Names on PR Merge
 on:
   pull_request:
     branches:
-      - development  # Trigger when a PR is merged into the development branch
+      - Development  # Trigger when a PR is merged into the development branch
     types:
       - closed  # Trigger only when the PR is closed (merged)
 
