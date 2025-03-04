@@ -1,37 +1,128 @@
 name: Notify Moved Files to Webhook
  
 on:
+
   push:
+
     branches:
+
       - Development  # Trigger when changes are pushed to the development branch
+
     paths:
+
       - '**/*'  # This means any file in the repository
  
 jobs:
+
   notify-webhook:
+
     runs-on: ubuntu-latest
  
     steps:
+
     - name: Checkout code
+
       uses: actions/checkout@v3
  
     - name: Get moved or renamed files
+
       id: get_files
+
       run: |
+
         # Get the list of files that were renamed or moved between commits
+
         FILES=$(git diff --name-only --diff-filter=R ${{ github.event.before }} ${{ github.event.after }})
+
         if [[ -z "$FILES" ]]; then
+
           echo "No moved files found."
+
           echo "FILES=" >> $GITHUB_ENV  # Set an empty variable
+
         else
+
           echo "Found moved files: $FILES"
+
           echo "FILES=$FILES" >> $GITHUB_ENV
+
         fi
  
     - name: Send file names to Fusion Webhook
+
       if: env.FILES != ''
+
       run: |
+
         WEBHOOK_URL="https://hook.app.workfrontfusion.com/9e5xgn2ci4rvv8s0m4whb16d4m3nhu9z"
+
         curl -X POST "$WEBHOOK_URL" \
+
              -H "Content-Type: application/json" \
+
+             -d "{\"files\": \"${{ env.FILES }}\"}"
+
+ 
+name: Notify Moved Files to Webhook
+ 
+on:
+
+  push:
+
+    branches:
+
+      - Development  # Trigger when changes are pushed to the development branch
+
+    paths:
+
+      - '**/*'  # This means any file in the repository
+ 
+jobs:
+
+  notify-webhook:
+
+    runs-on: ubuntu-latest
+ 
+    steps:
+
+    - name: Checkout code
+
+      uses: actions/checkout@v3
+ 
+    - name: Get moved or renamed files
+
+      id: get_files
+
+      run: |
+
+        # Get the list of files that were renamed or moved between commits
+
+        FILES=$(git diff --name-only --diff-filter=R ${{ github.event.before }} ${{ github.event.after }})
+
+        if [[ -z "$FILES" ]]; then
+
+          echo "No moved files found."
+
+          echo "FILES=" >> $GITHUB_ENV  # Set an empty variable
+
+        else
+
+          echo "Found moved files: $FILES"
+
+          echo "FILES=$FILES" >> $GITHUB_ENV
+
+        fi
+ 
+    - name: Send file names to Fusion Webhook
+
+      if: env.FILES != ''
+
+      run: |
+
+        WEBHOOK_URL="https://hook.app.workfrontfusion.com/9e5xgn2ci4rvv8s0m4whb16d4m3nhu9z"
+
+        curl -X POST "$WEBHOOK_URL" \
+
+             -H "Content-Type: application/json" \
+
              -d "{\"files\": \"${{ env.FILES }}\"}"
