@@ -1,34 +1,37 @@
-name: Notify Moved Files to Webhook
+name: Send File Names on PR Merge
 
 on:
-  push:
+  pull_request:
     branches:
-      - Development  # Trigger when changes are pushed to the development branch
-    paths:
-      - '**/*'  # This means any file in the repository
+      - development  # Trigger when a PR is merged into the development branch
+    types:
+      - closed  # Trigger only when the PR is closed (merged)
 
 jobs:
-  notify-webhook:
+  send_files_to_webhook:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Get moved or renamed files
-      id: get_files
+    - name: Set up Git
       run: |
-        # Get the list of files that were renamed or moved between commits
-        files=$(git diff --name-only --diff-filter=R HEAD^..HEAD)  # --diff-filter=R filters for renamed/moved files
-        echo "::set-output name=files::$files"
+        git fetch --prune --unshallow
 
-    - name: Send file names to Fusion Webhook
-      if: steps.get_files.outputs.files != ''
+    - name: Get list of files changed in the PR
       run: |
-        FILES="${{ steps.get_files.outputs.files }}"
-        WEBHOOK_URL="https://hook.app.workfrontfusion.com/9e5xgn2ci4rvv8s0m4whb16d4m3nhu9z"
-        
-        # Send the files to the webhook
-        curl -X POST "$WEBHOOK_URL" \
-             -H "Content-Type: application/json" \
-             -d "{\"files\": \"$FILES\"}"
+        # Get the list of files changed or created between the merge commit and the development branch
+        files=$(git diff --name-only --diff-filter=ACMRTU ${{ github.event.pull_request.base.sha }}..${{ github.sha }})
+
+        # Check if there are any changed/created files
+        if [ -n "$files" ]; then
+          echo "Files changed or created: $files"
+          # Replace <WEBHOOK_URL> with your actual webhook URL
+          curl -X POST "<WEBHOOK_URL>" -H "Content-Type: application/json" -d "{\"files\": \"$files\"}"
+        else
+          echo "No files were changed or created in this PR."
+        fi
+
+    - name: Complete
+      run: echo "File names have been sent to the webhook.
