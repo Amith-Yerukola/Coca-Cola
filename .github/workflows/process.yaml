@@ -3,7 +3,7 @@ name: My Workflow
 on:
   push:
     branches:
-      -Development  # Trigger on push to main branch
+      - main  # Trigger on push to main branch
 
 jobs:
   build:
