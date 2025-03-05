@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-      - development
-      - feature/*  # You can also use patterns to match branches like feature branches
+      - Development
+      - Scenario-1  # You can also use patterns to match branches like feature branches
 
 jobs:
   build:
