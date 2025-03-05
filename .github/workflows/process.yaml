@@ -1,37 +1,16 @@
-name: Send File Names on PR Merge
+name: My Workflow
 
 on:
   push:
     branches:
-      - Development  # Trigger when a PR is merged into the development branch
-    types:
-      - closed  # Trigger only when the PR is closed (merged)
+      - main  # Trigger on push to main branch
+  pull_request:
+    branches:
+      - main  # Trigger on PR creation or updates for main branch
 
 jobs:
-  send_files_to_webhook:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up Git
-      run: |
-        git fetch --prune --unshallow
-
-    - name: Get list of files changed in the PR
-      run: |
-        # Get the list of files changed or created between the merge commit and the development branch
-        files=$(git diff --name-only --diff-filter=ACMRTU ${{ github.event.pull_request.base.sha }}..${{ github.sha }})
-
-        # Check if there are any changed/created files
-        if [ -n "$files" ]; then
-          echo "Files changed or created: $files"
-          # Replace <WEBHOOK_URL> with your actual webhook URL
-          curl -X POST "<WEBHOOK_URL>" -H "Content-Type: application/json" -d "{\"files\": \"$files\"}"
-        else
-          echo "No files were changed or created in this PR"
-        fi
-
-    - name: Complete
-      run: echo "File names have been sent to the webhook.
+      - uses: actions/checkout@v2
+      - run: echo "Hello, world!"
