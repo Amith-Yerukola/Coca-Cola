@@ -1,9 +1,9 @@
 name: My Workflow
 
 on:
-  pull_request:
+  push:
     branches:
-      - main  # Trigger on PR creation or updates for main branch
+      - main  # Trigger on push to main branch
 
 jobs:
   build:
