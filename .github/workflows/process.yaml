@@ -1,13 +1,20 @@
-name: My Workflow
+name: CI Workflow
 
 on:
   push:
     branches:
-      - main  # Trigger on push to main branch
+      - main
+      - development
+      - feature/*  # You can also use patterns to match branches like feature branches
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - run: echo "Hello, world!"
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run tests
+        run: |
+          echo "Running tests for branch: $GITHUB_REF"
