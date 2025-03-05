@@ -3,7 +3,6 @@ name: CI Workflow
 on:
   push:
     branches:
-      - main
       - development
       - scenario-1  # You can also use patterns to match branches like feature branches
 
