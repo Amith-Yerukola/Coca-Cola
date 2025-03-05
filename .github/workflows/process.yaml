@@ -1,7 +1,7 @@
 name: Send File Names on PR Merge
 
 on:
-  pull_request:
+  push:
     branches:
       - Development  # Trigger when a PR is merged into the development branch
     types:
