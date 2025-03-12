@@ -3,6 +3,7 @@ name: Send Commit Message to Webhook
 on:
   push:
     branches:
+      - main 
       - development
 
 jobs:
