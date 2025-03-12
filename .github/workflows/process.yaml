@@ -1,71 +1,29 @@
-name: On Merge or Push to Development
+name: Send Commit Message to Webhook
 
 on:
   push:
     branches:
-      - main
-      - development  # Trigger the workflow on push to development branch
+      - development
 
 jobs:
-  notify_webhook:
+  notify-webhook:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository with full history
+      - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          fetch-depth: 0  # Fetch the full history
 
-      - name: Get changed files and their operations
-        id: get_changed_files
+      - name: Get the commit message
+        id: commit-message
         run: |
-          # Fetch full history
-          git fetch --prune --unshallow
+          # Get the commit message of the current push
+          commit_message=$(git log -1 --pretty=%B)
+          echo "Commit message: $commit_message"
+          echo "::set-output name=message::$commit_message"
 
-          # Get the commit hash of the previous and current commits
-          base_commit="${{ github.event.before }}"
-          head_commit="${{ github.sha }}"
-
-          # Ensure we have valid commits to compare
-          if [[ "$base_commit" == "0000000000000000000000000000000000000000" ]]; then
-            # If no previous commit (e.g., for a branch creation), compare with the initial commit
-            base_commit="HEAD~1"
-          fi
-
-          # Get the list of files and their operations (create, modify, delete)
-          changes=$(git diff --name-status "$base_commit" "$head_commit")
-
-          # Parse the output and prepare a JSON formatted string for each file with its operation
-          file_operations=""
-          while IFS=$'\t' read -r status file; do
-            case $status in
-              A)
-                operation="create"
-                ;;
-              M)
-                operation="update"
-                ;;
-              D)
-                operation="delete"
-                ;;
-              *)
-                operation="unknown"
-                ;;
-            esac
-
-            file_operations+=$(printf '{"file": "%s", "operation": "%s"},' "$file" "$operation")
-          done <<< "$changes"
-
-          # Remove the trailing comma and wrap the result in a JSON array
-          file_operations="[${file_operations%,}]"
-          echo "::set-output name=files::$file_operations"
-
-      - name: Send filenames and operations to Webhook
+      - name: Send commit message to webhook
         run: |
-          # Get the list of file operations from the previous step
-          file_operations="${{ steps.get_changed_files.outputs.files }}"
-          webhook_url='https://hook.app.workfrontfusion.com/9e5xgn2ci4rvv8s0m4whb16d4m3nhu9z'
-          
-          # Send the payload to the webhook
-          curl -X POST -H "Content-Type: application/json" -d '{"files":'"$file_operations"'}' $webhook_url
-       
+          # Send the commit message to the webhook
+          curl -X POST ${{ secrets.WEBHOOK_URL }} \
+            -H "Content-Type: application/json" \
+            -d '{"commit_message": "${{ steps.commit-message.outputs.message }}"}'
