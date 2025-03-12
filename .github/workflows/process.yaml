@@ -3,6 +3,7 @@ name: On Merge or Push to Development
 on:
   push:
     branches:
+      - main
       - development  # Trigger the workflow on push to development branch
 
 jobs:
