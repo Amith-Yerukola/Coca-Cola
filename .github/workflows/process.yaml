@@ -1,20 +1,30 @@
-name: CI Workflow
+name: Notify Webhook on File Push/Merge
 
 on:
   push:
     branches:
       - main
       - development
-      - scenario-1  # You can also use patterns to match branches like feature branches
 
 jobs:
-  build:
+  notify-webhook:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout the repository
         uses: actions/checkout@v2
 
-      - name: Run tests
+      - name: Get the list of changed files
+        id: changed-files
         run: |
-          echo "Running tests for branch: $GITHUB_REF"
+          # Get the list of changed files in the push/merge
+          files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          # Convert the list of files to a JSON array (for webhook payload)
+          echo "::set-output name=files::[\"$(echo "$files" | tr '\n' '","' | sed 's/,$//')\"]"
+
+      - name: Send files to webhook
+        run: |
+          # Send the changed files to the webhook URL
+          curl -X POST ${{ secrets.WEBHOOK_URL }} \
+            -H "Content-Type: application/json" \
+            -d '{"files": ${{ steps.changed-files.outputs.files }}}'
