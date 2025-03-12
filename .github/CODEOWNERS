@@ -1,0 +1,6 @@
+# This is a comment
+# The format is:
+# <file-pattern>  <owner(s)>
+
+# Automatically assign a user to review changes in any file in the repository
+* @Amith-Yerukola
